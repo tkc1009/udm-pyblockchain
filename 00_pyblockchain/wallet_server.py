@@ -35,12 +35,19 @@ def create_transaction():
         'value')
     if not all(k in request_json for k in required):
         return 'missing values', 400
-    
+
     sender_private_key = request_json['sender_private_key']
     sender_blockchain_address = request_json['sender_blockchain_address']
     recipient_blockchain_address = request_json['recipient_blockchain_address']
     sender_public_key = request_json['sender_public_key']
     value = float(request_json['value'])
+
+    app.logger.warning({
+            'sender_blockchain_address': sender_blockchain_address,
+            'recipient_blockchain_address': recipient_blockchain_address,
+            'value': value,
+            'sender_public_key': sender_public_key,
+            'sender_private_key': sender_private_key})
 
     transaction = wallet.Transaction(
         sender_private_key,
@@ -58,19 +65,18 @@ def create_transaction():
         'signature': transaction.generate_signature(),
     }
 
-    response = request.post(
-        urllib.parse.urljoin(app.config['gw'], 'transaction'),
+    response = requests.post(
+        urllib.parse.urljoin(app.config['gw'], 'transactions'),
         json=json_data, timeout=3)
     
     if response.status_code == 201:
         return jsonify({'message': 'success'}), 201
-    
     return jsonify({'message': 'fail', 'response': response}), 400
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
-    parser.add_argument('-p', '--port', default=8080,
+    parser.add_argument('-p', '--port', default=5080,
                         type=int, help='port to listen on')
     parser.add_argument('-g', '--gw', default='http://127.0.0.1:5000',
                         type=str, help='blockchain gateway')

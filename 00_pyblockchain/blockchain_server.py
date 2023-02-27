@@ -54,14 +54,20 @@ def transaction():
         
         is_created = block_chain.create_transaction(
             request_json['sender_blockchain_address'],
-            request_json['recioient_blockchain_address'],
+            request_json['recipient_blockchain_address'],
             request_json['value'],
             request_json['sender_public_key'],
             request_json['signature'],
         )
+        app.logger.warning({
+            'sender_blockchain_address': request_json['sender_blockchain_address'],
+            'recipient_blockchain_address': request_json['recipient_blockchain_address'],
+            'value': request_json['value'],
+            'sender_public_key': request_json['sender_public_key'],
+            'signature': request_json['signature']
+        })
         if not is_created:
             return jsonify({'message': 'fail'}), 400
-        
         return jsonify({'message': 'success'}), 201
 
 if __name__ == '__main__':
