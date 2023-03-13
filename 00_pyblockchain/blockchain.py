@@ -180,3 +180,20 @@ class BlockChain(object):
                 if blockchain_address == transaction['sender_blockchain_address']:
                     total_amount -= value
         return total_amount
+    
+    def valid_chain(self, chain):
+        pre_block = chain(0)
+        current_index = 1
+        while current_index < len(chain):
+            block = chain(current_index)
+            if block['previous_hash'] != self.hash(pre_block):
+                return False
+            
+            if not self.valid_proof(
+                    block['transactions'], block['previous_hash'],
+                    block['nonce'], MINING_DIFFICULTY):
+                return False
+            
+            pre_block = block
+            current_index += 1
+        return True
