@@ -205,13 +205,15 @@ class BlockChain(object):
     def resolve_conflicts(self):
         longest_chain = None
         max_length = len(self.chain)
+        logger.info({'node': 'self', 'length': max_length})
         for node in self.neighbours:
             response = requests.get(f'http://{node}/chain')
             if response.status_code == 200:
                 response_json = response.json()
                 chain = response_json['chain']
                 chain_length = len(chain)
-                if chain_length > max_length and self.valid_chain(chain):
+                logger.info({'node': node, 'length': chain_length})
+                if chain_length > max_length:
                     max_length = chain_length
                     longest_chain = chain
         
