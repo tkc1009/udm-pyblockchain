@@ -116,6 +116,12 @@ def start_mine():
     get_blockchain().start_mining()    
     return jsonify({'message': 'success'}), 200
 
+@app.route('/consensus', methods=['PUT'])
+def consensus():
+    block_chain = get_blockchain()
+    replaced = block_chain.resolve_conflicts()
+    return jsonify({'replaced': replaced}), 200
+
 if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser()
